@@ -13,7 +13,7 @@
            SELECT NEWEMP  ASSIGN TO NEWEMP
                            FILE STATUS IS NEWEMP-FILE-STATUS.
            SELECT ERRTRAN  ASSIGN TO ERRTRAN3
-                           FILE STATUS IS ERRTRAN3-FILE-STATUS.
+                           FILE STATUS IS ERRTRAN-FILE-STATUS.
 
        DATA DIVISION.
 
@@ -32,7 +32,7 @@
        01  NEW-EMPLOYEE-RECORD.
            05  NM-EMPLOYEE-ID             PIC X(5).
            05  NM-EMPLOYEE-NAME           PIC X(30).
-           05  NM-DEPARTMENT              PIC X(5).
+           05  NM-DEPART-CODE              PIC X(5).
            05  NM-JOB-CLASS               PIC X(2).
            05  NM-ANNUAL-SALARY           PIC S9(5)V99.
            05  NM-VACATION-HOURS          PIC S9(3).
@@ -68,7 +68,7 @@
            05  ET-MASTER-DATA.
                10  ET-EMPLOYEE-ID        PIC X(5).
                10  ET-EMPLOYEE-NAME      PIC X(30).
-               10  ET-DEPARTMENT-CODE    PIC X(5).
+               10  ET-DEPART-CODE    PIC X(5).
                10  ET-JOB-CLASS          PIC X(2).
                10  ET-ANNUAL-SALARY      PIC S9(5)V99.
 
@@ -83,14 +83,14 @@
 
        PROCEDURE DIVISION.
 
-       000-MAINTAIN-INVENTORY-FILE.
+       000-MAINTAIN-EMPLOYEE-FILE.
 
            OPEN INPUT  OLDEMP
                        EMPTRAN
                 OUTPUT NEWEMP
                        ERRTRAN.
 
-           PERFORM 310-READ-INVENTORY-TRANSACTION
+           PERFORM 310-READ-EMPLOYEE-TRANSACTION
            PERFORM 320-READ-OLD-MASTER
 
            PERFORM 300-MAINTAIN-EMPLOYEE-RECORD
@@ -104,28 +104,38 @@
 
        300-MAINTAIN-EMPLOYEE-RECORD.
 
+           IF NEED-TRANSACTION 
+                PERFORM 310-READ-EMPLOYEE-TRANSACTION
+                MOVE "N" TO NEED-TRANSACTION-SWITCH.
+           IF NEED-MASTER
+                PERFORM 320-READ-OLD-MASTER
+                MOVE "N" TO NEED-MASTER-SWITCH.
+           IF WRITE-MASTER 
+                 PERFORM 340-WRITE-NEW-MASTER 
+                 MOVE "N" TO WRITE-MASTER-SWITCH.
+
            PERFORM 330-MATCH-MASTER-TRAN.
            IF WRITE-MASTER
                PERFORM 340-WRITE-NEW-MASTER
                MOVE "N" TO WRITE-MASTER-SWITCH.
 
-       310-READ-INVENTORY-TRANSACTION.
+       310-READ-EMPLOYEE-TRANSACTION.
 
            READ EMPTRAN INTO EMPLOYEE-TRANSACTION
                AT END
-                   MOVE HIGH-VALUE TO ET-ITEM-NO.
+                   MOVE HIGH-VALUE TO ET-EMPLOYEE-ID.
 
        320-READ-OLD-MASTER.
 
            READ OLDEMP INTO EMPLOYEE-MASTER-RECORD
                AT END
-                   MOVE HIGH-VALUE TO IM-ITEM-NO.
+                   MOVE HIGH-VALUE TO ET-EMPLOYEE-ID.
 
        330-MATCH-MASTER-TRAN.
 
-           IF IM-ITEM-NO > ET-ITEM-NO
+           IF EM-EMPLOYEE-ID > ET-EMPLOYEE-ID
                PERFORM 350-PROCESS-HI-MASTER
-           ELSE IF IM-ITEM-NO < ET-ITEM-NO
+           ELSE IF EM-EMPLOYEE-ID < ET-EMPLOYEE-ID
                PERFORM 360-PROCESS-LO-MASTER
            ELSE
                PERFORM 370-PROCESS-MAST-TRAN-EQUAL.
@@ -135,7 +145,7 @@
            WRITE NEW-EMPLOYEE-RECORD.
            IF NOT NEWEMP-SUCCESSFUL
                DISPLAY "WRITE ERROR ON NEWEMP FOR ITEM NUMBER "
-                   IM-ITEM-NO
+                   EM-EMPLOYEE-ID
                DISPLAY "FILE STATUS CODE IS " NEWEMP-FILE-STATUS
                SET ALL-RECORDS-PROCESSED TO TRUE.
 
@@ -154,7 +164,7 @@
 
        370-PROCESS-MAST-TRAN-EQUAL.
 
-           IF IM-ITEM-NO = HIGH-VALUES
+           IF EM-EMPLOYEE-ID = HIGH-VALUES
                SET ALL-RECORDS-PROCESSED TO TRUE
            ELSE
                IF DELETE-RECORD
@@ -167,13 +177,12 @@
 
        380-APPLY-ADD-TRANSACTION.
 
-           MOVE ET-ITEM-NO TO NM-ITEM-NO.
-           MOVE ET-ITEM-DESC TO NM-ITEM-DESC.
-           MOVE ET-UNIT-COST TO NM-UNIT-COST.
-           MOVE ET-UNIT-PRICE TO NM-UNIT-PRICE.
-           MOVE ET-REORDER-POINT TO NM-REORDER-POINT.
-           MOVE ZERO TO NM-ON-HAND
-                        NM-ON-ORDER.
+           MOVE ET-EMPLOYEE-ID TO NM-EMPLOYEE-ID.
+           MOVE ET-EMPLOYEE-NAME TO NM-EMPLOYEE-NAME.
+           MOVE ET-DEPART-CODE TO NM-DEPART-CODE.
+           MOVE ET-JOB-CLASS TO NM-JOB-CLASS.
+           MOVE ET-ANNUAL-SALARY TO NM-ANNUAL-SALARY.
+
            SET WRITE-MASTER TO TRUE.
            SET NEED-TRANSACTION TO TRUE.
 
@@ -181,8 +190,8 @@
 
            WRITE ERROR-TRANSACTION FROM EMPLOYEE-TRANSACTION.
            IF NOT ERRTRAN-SUCCESSFUL
-               DISPLAY "WRITE ERROR ON ERRTRAN FOR ITEM NUMBER "
-                   ET-ITEM-NO
+               DISPLAY "WRITE ERROR ON ERRTRAN FOR EMPLOYEE ID "
+                   ET-EMPLOYEE-ID
                DISPLAY "FILE STATUS CODE IS " ERRTRAN-FILE-STATUS
                SET ALL-RECORDS-PROCESSED TO TRUE
            ELSE
