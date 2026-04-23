@@ -1,4 +1,4 @@
-# Cobol Assignment 7 
+# VSAM KSDS Management & Random Access 
 
 This repository contains a comprehensive suite of COBOL programs and JCL procedures designed to manage employee records using both sequential and indexed (VSAM) file structures.
 
