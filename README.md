@@ -16,12 +16,6 @@ Compared to previous iterations like **SEQ1000** and **SEQ2000**, this version i
 * **Calculated Fields & Rounding:** Uses `COMPUTE` with `ROUNDED` functionality to ensure that total sums and averages maintain financial accuracy across large datasets.
 * **Enhanced Working-Storage Management:** Optimized use of `PIC` clauses and group items to better manage memory and record layouts during sequential processing.
 
-## Program Output
-
-Below is a screenshot of the SEQ3000 execution, showing the processed records and the resulting summary report:
-
-![Program Output](Assets/SEQ3000_Output.png) 
-
 ---
 
 ### Author Profiles
