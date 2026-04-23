@@ -32,7 +32,7 @@
        01  NEW-EMPLOYEE-RECORD.
            05  NM-EMPLOYEE-ID             PIC X(5).
            05  NM-EMPLOYEE-NAME           PIC X(30).
-           05  NM-DEPART-CODE              PIC X(5).
+           05  NM-DEPART-CODE             PIC X(5).
            05  NM-JOB-CLASS               PIC X(2).
            05  NM-ANNUAL-SALARY           PIC S9(5)V99.
            05  NM-VACATION-HOURS          PIC S9(3).
@@ -68,14 +68,14 @@
            05  ET-MASTER-DATA.
                10  ET-EMPLOYEE-ID        PIC X(5).
                10  ET-EMPLOYEE-NAME      PIC X(30).
-               10  ET-DEPART-CODE    PIC X(5).
+               10  ET-DEPART-CODE        PIC X(5).
                10  ET-JOB-CLASS          PIC X(2).
                10  ET-ANNUAL-SALARY      PIC S9(5)V99.
 
        01  EMPLOYEE-MASTER-RECORD.
            05  EM-EMPLOYEE-ID            PIC X(5).
            05  EM-EMPLOYEE-NAME          PIC X(30).
-           05  EM-DEPARTMENT             PIC X(5).
+           05  EM-DEPART-CODE            PIC X(5).
            05  EM-JOB-CLASS              PIC X(2).
            05  EM-ANNUAL-SALARY          PIC S9(5)V99.
            05  EM-VACATION-HOURS         PIC S9(3).
@@ -104,14 +104,14 @@
 
        300-MAINTAIN-EMPLOYEE-RECORD.
 
-           IF NEED-TRANSACTION 
+           IF NEED-TRANSACTION
                 PERFORM 310-READ-EMPLOYEE-TRANSACTION
                 MOVE "N" TO NEED-TRANSACTION-SWITCH.
            IF NEED-MASTER
                 PERFORM 320-READ-OLD-MASTER
                 MOVE "N" TO NEED-MASTER-SWITCH.
-           IF WRITE-MASTER 
-                 PERFORM 340-WRITE-NEW-MASTER 
+           IF WRITE-MASTER
+                 PERFORM 340-WRITE-NEW-MASTER
                  MOVE "N" TO WRITE-MASTER-SWITCH.
 
            PERFORM 330-MATCH-MASTER-TRAN.
@@ -129,7 +129,7 @@
 
            READ OLDEMP INTO EMPLOYEE-MASTER-RECORD
                AT END
-                   MOVE HIGH-VALUE TO ET-EMPLOYEE-ID.
+                   MOVE HIGH-VALUE TO EM-EMPLOYEE-ID.
 
        330-MATCH-MASTER-TRAN.
 
@@ -205,12 +205,14 @@
 
        410-APPLY-CHANGE-TRANSACTION.
 
-           IF ET-ITEM-DESC NOT = SPACE
-               MOVE ET-ITEM-DESC TO IM-ITEM-DESC.
-           IF ET-UNIT-COST NOT = ZERO
-               MOVE ET-UNIT-COST TO IM-UNIT-COST.
-           IF ET-UNIT-PRICE NOT = ZERO
-               MOVE ET-UNIT-PRICE TO IM-UNIT-PRICE.
-           IF ET-REORDER-POINT NOT = ZERO
-               MOVE ET-REORDER-POINT TO IM-REORDER-POINT.
+           IF ET-EMPLOYEE-NAME NOT = SPACE
+               MOVE ET-EMPLOYEE-NAME TO EM-EMPLOYEE-NAME.
+           IF ET-DEPART-CODE NOT = SPACE
+               MOVE ET-DEPART-CODE TO EM-DEPART-CODE.
+           IF ET-JOB-CLASS NOT = SPACE
+               MOVE ET-JOB-CLASS TO EM-JOB-CLASS.
+           IF ET-ANNUAL-SALARY NOT = ZEROS
+               MOVE ET-ANNUAL-SALARY TO EM-ANNUAL-SALARY.
+
+
            SET NEED-TRANSACTION TO TRUE.
