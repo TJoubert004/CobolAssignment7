@@ -1,4 +1,4 @@
-# Enterprise Computing: Employee Master File Maintenance Suite
+# Cobol Assignment 7 
 
 This repository contains a comprehensive suite of COBOL programs and JCL procedures designed to manage employee records using both sequential and indexed (VSAM) file structures.
 
