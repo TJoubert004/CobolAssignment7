@@ -63,6 +63,18 @@ Compared to previous iterations like `SEQ1000` and `SEQ2000`, this project intro
 
 ---
 
+## Program Output
+
+Below are the execution results of the SEQ3000 program and the EMPIND02 Program using the JCLPVSAM.jcl file:
+
+### SEQ3000
+![SEQ3000 Output](Assets/SEQ3000_Output.png)
+
+### Unknown Name Validation
+![EMPIND02 Output](Assets/EMPIND02_Output.png)
+
+---
+
 ## Author Profiles
 
 * **Tristan Joubert** - [GitHub Profile](https://github.com/your-profile-link)
